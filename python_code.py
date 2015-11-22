@@ -52,7 +52,7 @@ def prob_log_norm( x, s, m):
 ## If it belongs, that is the local minimum; if it doesn't it takes the end of s_i which is closest to X.
 ## The global minimum will be the minimum after all Spree segments are taken into account.
 def min_dist_from_spree( X, spree ):
-	dist_spree = 1000.0     ## set the start distance to 1000Km
+	dist_spree = []                    ## record the distances from each segment
 	for ii3 in range(len(spree)-1):
 		spree_v = [spree[ii3+1][0]-spree[ii3][0], spree[ii3+1][1]-spree[ii3][1]]      ## spree vector i to i+1
 		ii_P_vec = [ X[0]-spree[ii3][0], X[1]-spree[ii3][1]]                          ## vector from i to X
@@ -60,12 +60,10 @@ def min_dist_from_spree( X, spree ):
 		proj_x_on_line = [ spree[ii3][0] + scale * spree_v[0] , spree[ii3][1] + scale * spree_v[1] ]  ## projection of X on spree_v 
 		## is the projection belonging to the segment? If yes, take that one, otherwise take the closest vertix
 		if dist_p1_p2( proj_x_on_line, spree[ii3]) + dist_p1_p2( proj_x_on_line, spree[ii3+1]) > 1.001*dist_p1_p2( spree[ii3], spree[ii3+1]):
-			x_to_spree = min(dist_p1_p2(X, spree[ii3]), dist_p1_p2(X, spree[ii3+1]))
+			dist_spree.append( min(dist_p1_p2(X, spree[ii3]), dist_p1_p2(X, spree[ii3+1])) )
 		else:
-			x_to_spree = dist_p1_p2(X,proj_x_on_line)
-		if	x_to_spree < dist_spree:   ## see whether it's the segment with minimum distance 
-			dist_spree = x_to_spree
-	return dist_spree
+			dist_spree.append( dist_p1_p2(X,proj_x_on_line) )
+	return min(dist_spree)
 
 ## transform degrees in km
 spree   = [ degrees_to_km( ii, S ) for ii in spree  ]
